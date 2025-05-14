@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Bütçe Düzenle{% endblock %}
+
+{% block content %}
+<div class="unit-dashboard">
+    <h2>Bütçe Kaydını Düzenle</h2>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="month">Ay:</label>
+            <input type="month" id="month" name="month" value="{{ budget.month }}" readonly>
+            <small class="form-text">Ay bilgisi değiştirilemez.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="total_budget">Toplam Bütçe (TL):</label>
+            <input type="number" id="total_budget" name="total_budget" step="0.01" min="0"
+                value="{{ budget.total_budget }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="spent_22d">4734 sayılı Kanun 22/d kapsamında harcanan (TL):</label>
+            <input type="number" id="spent_22d" name="spent_22d" step="0.01" min="0" value="{{ budget.spent_22d }}">
+        </div>
+
+        <div class="form-group">
+            <label for="spent_22f">4734 sayılı Kanun 22/f kapsamında harcanan (TL):</label>
+            <input type="number" id="spent_22f" name="spent_22f" step="0.01" min="0" value="{{ budget.spent_22f }}">
+        </div>
+
+        <button type="submit" class="btn primary">Güncelle</button>
+        <a href="{{ url_for('unit.dashboard') }}" class="btn">İptal</a>
+    </form>
+</div>
+{% endblock %}

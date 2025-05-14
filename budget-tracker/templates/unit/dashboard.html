@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Birim Paneli{% endblock %}
+
+{% block content %}
+<div class="unit-dashboard">
+    <h2>Harcama Birimi Paneli</h2>
+
+    <div class="actions">
+        <a href="{{ url_for('unit.add_budget') }}" class="btn primary">
+            Yeni Bütçe Kaydı Ekle
+        </a>
+    </div>
+
+
+    <h3>Bütçe Kayıtlarım</h3>
+
+    {% if budgets %}
+    <table class="budgets-table">
+        <thead>
+            <tr>
+                <th>Ay</th>
+                <th>Toplam Bütçe</th>
+                <th>22/d Harcama</th>
+                <th>22/f Harcama</th>
+                <th>Toplam Harcama</th>
+                <th>Bütçe Kullanım Oranı</th>
+                <th>Durum</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+            {% set total_spent = budget.spent_22d + budget.spent_22f %}
+            {% set usage_ratio = (total_spent / budget.total_budget * 100) if budget.total_budget > 0 else 0 %}
+            <tr>
+                <td>{{ budget.month }}</td>
+                <td>{{ budget.total_budget|format_currency }}</td>
+                <td>{{ budget.spent_22d|format_currency }}</td>
+                <td>{{ budget.spent_22f|format_currency }}</td>
+                <td>{{ total_spent|format_currency }}</td>
+                <td>
+                    <div class="progress-container">
+                        <div class="progress-bar {% if usage_ratio > 90 %}danger{% elif usage_ratio > 70 %}warning{% endif %}"
+                            data-ratio="{{ usage_ratio }}">
+                            {{ "%.2f"|format(usage_ratio) }}%
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% if usage_ratio > 90 %}
+                    <span style="color: #e74c3c;">Kritik</span>
+                    {% elif usage_ratio > 70 %}
+                    <span style="color: #f39c12;">Uyarı</span>
+                    {% else %}
+                    <span style="color: #2ecc71;">Normal</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">Henüz bütçe kaydı bulunmamaktadır.</p>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Progress bar genişliklerini ayarla
+        document.querySelectorAll('.progress-bar[data-ratio]').forEach(el => {
+            el.style.width = el.dataset.ratio + '%';
+        });
+
+        // Renk sınıflarını dinamik olarak uygula (isteğe bağlı)
+        document.querySelectorAll('.progress-bar').forEach(el => {
+            const ratio = parseFloat(el.dataset.ratio);
+            if (ratio > 90) {
+                el.classList.add('danger');
+            } else if (ratio > 70) {
+                el.classList.add('warning');
+            }
+        });
+    });
+</script>
+{% endblock %}

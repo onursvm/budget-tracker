@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Bütçe Listesi{% endblock %}
+
+{% block content %}
+<div class="unit-dashboard">
+    <h2>Bütçe Kayıtları</h2>
+
+    {% if budgets %}
+    <table class="budgets-table">
+        <thead>
+            <tr>
+                <th>Ay</th>
+                <th>Toplam Bütçe</th>
+                <th>22/d Harcama</th>
+                <th>22/f Harcama</th>
+                <th>Toplam Harcama</th>
+                <th>Bütçe Kullanım Oranı</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for budget in budgets %}
+            {% set total_spent = budget.spent_22d + budget.spent_22f %}
+            {% set usage_ratio = (total_spent / budget.total_budget * 100) if budget.total_budget > 0 else 0 %}
+            <tr>
+                <td>{{ budget.month }}</td>
+                <td>{{ budget.total_budget|format_currency }}</td>
+                <td>{{ budget.spent_22d|format_currency }}</td>
+                <td>{{ budget.spent_22f|format_currency }}</td>
+                <td>{{ total_spent|format_currency }}</td>
+                <td>
+                    <div class="progress-container">
+                        <div class="progress-bar {% if usage_ratio > 90 %}danger{% elif usage_ratio > 70 %}warning{% endif %}"
+                            data-ratio="{{ usage_ratio }}">
+                            {{ "%.2f"|format(usage_ratio) }}%
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <a href="{{ url_for('unit.edit_budget', id=budget.id) }}" class="btn small">Düzenle</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">Henüz bütçe kaydı bulunmamaktadır.</p>
+    {% endif %}
+
+    <div class="actions">
+        <a href="{{ url_for('unit.add_budget') }}" class="btn primary">Yeni Kayıt</a>
+        <a href="{{ url_for('unit.dashboard') }}" class="btn">Geri</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const progressBars = document.querySelectorAll('.progress-bar[data-ratio]');
+        progressBars.forEach(bar => {
+            bar.style.width = bar.dataset.ratio + '%';
+        });
+    });
+</script>
+{% endblock %}

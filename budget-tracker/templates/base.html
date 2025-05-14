@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bütçe Takip Sistemi{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Bütçe Takip Sistemi</h1>
+            <nav>
+                {% if current_user.is_authenticated %}
+                <span>Hoşgeldiniz, {{ current_user.username }} ({{ current_user.role }})</span>
+                <a href="{{ url_for('auth.logout') }}">Çıkış Yap</a>
+                {% if current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}">Yönetici Paneli</a>
+                {% else %}
+                <a href="{{ url_for('unit.dashboard') }}">Harcama Paneli</a>
+                {% endif %}
+                {% endif %}
+            </nav>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flashes">
+            {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+
+</html>

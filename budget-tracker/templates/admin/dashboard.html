@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Yönetici Paneli{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h2>Yönetici Paneli</h2>
+
+    <div class="actions">
+        <a href="{{ url_for('admin.register_unit') }}" class="btn primary">
+            Yeni Harcama Birimi Ekle
+        </a>
+        <a href="{{ url_for('admin.change_admin_password') }}" class="btn">
+            Şifremi Değiştir
+        </a>
+    </div>
+
+    <h3>Kayıtlı Harcama Birimleri</h3>
+
+    {% if units %}
+    <table class="units-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Kullanıcı Adı</th>
+                <th>Oluşturulma Tarihi</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for unit in units %}
+            <tr>
+                <td>{{ unit.id }}</td>
+                <td>{{ unit.username }}</td>
+                <td>{{ unit.created_at | datetimeformat }}</td>
+                <td>
+                    <a href="{{ url_for('admin.reset_password', user_id=unit.id) }}" class="btn small">Şifre Sıfırla</a>
+                    <form method="POST" action="{{ url_for('admin.delete_user', user_id=unit.id) }}"
+                        style="display: inline;">
+                        <button type="submit" class="btn small danger"
+                            onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">Sil</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-data">Henüz kayıtlı harcama birimi bulunmamaktadır.</p>
+    {% endif %}
+</div>
+{% endblock %}
